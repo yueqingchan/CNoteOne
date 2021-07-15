@@ -1,0 +1,4 @@
+还需要看的内容:
+1.要获取和修改打开的文件标志（例如：O_APPEND、O_NONBLOCK和O_ASYNC），可执行fcntl()的F_GETFL和F_SETFL操作，其对作用域的约束与上一条颇为类似。
+2.file  XX.c  size  XX.c   ldd 命令的使用
+3.符号表的使用

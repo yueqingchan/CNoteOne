@@ -1,0 +1,86 @@
+C基础03
+
+1.内存区域
+  全局变量-->作用域全局.所以全局不能重名.
+  auto变量->作用域代码块 ,如果没有赋初值，内容为随机.
+  static变量->作用域当前文件
+
+  	允许在不同的函数中使用相同的变量名，它们代表不同的对象，分配不同的单元，互不干扰。
+  	同一源文件中,允许全局变量和局部变量同名，在局部变量的作用域内，全局变量不起作用。
+  	所有的函数默认都是全局的，意味着所有的函数都不能重名，但如果是staitc函数，那么作用域是文件级的，所以不同的文件static函数名是可以相同的。
+2.内存分区
+  text :可执行二进制程序代码(函数)
+
+  全局变量:
+  data(全局+静态  初始化区) , bss(全局+静态 未初始化区),常量池
+
+  栈区:编译器对变量自动分配和释放
+  堆区:需要手动申请和释放,否则就在进程退出时释放.
+
+3.内存操作函数
+  memset  : void *memset(void *s, int c, size_t n);
+            功能：将s的内存区域的前n个字节以参数c填入
+                  填充的字符，c虽然参数为int，但必须是unsigned char , 范围为0~255.byte的上限就这么高,不能越界.
+  memcpy  : void *memcpy(void *dest, const void *src, size_t n)
+            拷贝src所指的内存内容的前n个字节到dest所值的内存地址上.
+            源内存首地址，注意：dest和src所指的内存空间不可重叠
+  memcmp:   int memcmp(const void *s1, const void *s2, size_t n);
+            比较s1和s2所指向内存区域的前n个字节
+            相等：=0
+            大于：>0
+            小于：<0
+
+  malloc:   void *malloc(size_t size);
+  free:
+  先maloc在memset再free
+
+4.数组指针
+  char *name="hello!"; 修改字符串无效,因为在常量池.但是name++是可以的.
+  char[]name="hello"; name[i]可以修改,但是name不能++,因为name是个常量.
+
+
+5.结构体
+  struct Stu{  char * name, int age};
+  //1.首先申请总体的内存 2.申请内部的内存 3.释放内部的内存 4.释放总体内存
+
+6.union
+  	联合union是一个能在同一个存储空间存储不同类型数据的类型；
+  	联合体所占的内存长度等于其最长成员的长度，也有叫做共用体；
+  	同一内存段可以用来存放几种不同类型的成员，但每一瞬时只有一种起作用；
+  	共用体变量中起作用的成员是最后一次存放的成员，在存入一个新的成员后原有的成员的值会被覆盖；
+  	共用体变量的地址和它的各成员的地址都是同一地址。
+
+7.enum  默认是0开始.int值.
+
+8.文件操作
+   多进程和多线程操作文件:  https://blog.csdn.net/daiyudong2020/article/details/52015817
+   文件路径: // 只能是windows. \在linux和windows通用.
+
+   r+  rb+ 可读可写,文件不存在,则不创建
+   w+  wb+ 可读可写,文件不存在,创建新文件.存在的话,则清空文件,从头写入.
+   a+  ab+ 可读可写,文件不存在,创建新文件.存在的话,从结尾处开始写入.
+   windows中操作文本不加b,操作普通文件则加b
+   	b是二进制模式的意思，b只是在Windows有效，在Linux用r和rb的结果是一样的
+   	Unix和Linux下所有的文本文件行都是\n结尾，而Windows所有的文本文件行都是\r\n结尾
+   	在Windows平台下，以“文本”方式打开文件，不加b：
+        	当读取文件的时候，系统会将所有的 "\r\n" 转换成 "\n"
+        	当写入文件的时候，系统会将 "\n" 转换成 "\r\n" 写入
+
+   FILE *file= fopen(filePath,"r+");
+       if(file==NULL){
+           perror("open file  fail");//open file  fail: No such file or directory
+       }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

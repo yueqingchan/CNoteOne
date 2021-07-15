@@ -1,0 +1,164 @@
+C提升:
+1.sizeof 数组在当作形参的时候,退化为指针.否则值传递,会消耗大量性能.
+
+2.变量的作用:
+  1)变量的本质,一段连续内存空间的别名.
+  2)程序通过变量名来申请和命名内存空间.
+  3)通过变量名访问内存空间.
+  4)不是向变量名读写数据,而是向变量名所代表的内存地址读写数据.
+
+3.内存模型
+            栈         向下生长
+
+高地址       堆         向上生长
+    /|\                  /|\
+     |                    |
+     |                    |
+     |                    |
+     |       堆       start
+     |       bss    未初始化的全局变量
+低地址
+             data   已初始化的全局变量
+
+             text   代码区
+
+4.变量的生命周期和作用域
+            生命周期       作用域                                   内存
+  static       全局        {} 则是代码块, 全局变量则是当前文件       data/bss
+  extern       全局        全局                                   data/bss
+  auto         { }         {}                                       栈
+  方法          全局        {}                                    方法区  text
+  static函数    全局        当前文件                               方法区  text
+  "Hello!"      全局        全局                                  data段
+  宏定义       当前页面    当前页面
+
+5.栈区内存
+        自动释放
+  堆区内存
+        需要手动释放,如果没释放,程序结束的时候自动回收.
+        //free()函数的功能只是告诉系统 p 指向的内存可以回收了
+        // 就是说，p 指向的内存使用权交还给系统
+        //但是，p的值还是原来的值(野指针)，p还是指向原来的内存
+
+
+6.堆操作函数
+
+  int*pNum= calloc(sizeof(int),5);
+  申请内存,并且自动设置为0
+
+  void *realloc(void *ptr, size_t size);,不需要自己释放,ptr.系统会帮着释放.
+
+  重新分配用malloc或者calloc函数在堆中分配内存空间的大小。
+  realloc不会自动清理增加的内存，需要手动清理，如果指定的地址后面有连续的空间，
+  那么就会在已有地址基础上增加内存，如果指定的地址后面没有空间，那么realloc会重新分配新的连续内存，
+  把旧内存的值拷贝到新内存，同时释放旧内存。
+
+7.方法栈
+  压栈,向下生长,所以栈顶地址会变小.
+  弹栈,则相反.
+
+8.测试大小端,小端排序,低位对低位,高位对高位.   数字的低位就是个十百千万的高低.
+      int num=0XAABBCCDD;
+      unsigned char *pChar=&num;
+      printf("%X\n",*pChar);      //DD
+      printf("%X\n",*(pChar+1));  //CC
+      printf("%X\n",*(pChar+2));  //BB
+      printf("%X\n",*(pChar+3));  //AA
+
+9.指针赋值
+  void setPCharData(int **pInt) {
+      *pInt = malloc(sizeof(int));
+      **pInt=20;
+  }
+
+  void testPSetData() {
+      int *pInt = NULL; //虽然pInt是NULL,但是变量本身是存在地址的. 只是里面内容是0
+      setPCharData(&pInt);
+      printf("%d\n",*pInt);
+      free(pInt);
+  }
+
+10.指针易错点:
+   1)指针越界,char name[3]="ABC";
+   2)p++, p地址变了,不能对当前指针释放
+   3)栈上申请的指针地址,{}会被回收.  不能再次释放.
+   4)同一个指针多次释放.
+
+11.位运算相关
+   ~取反运算
+   &求与
+   |求或
+   ^异或
+
+12.位移运算
+   <<右侧补0  >>左侧是否补0看操作系统,不确定.
+
+13.异或总结:
+   1)任意一个变量X与其自身进行异或运算，结果为0，即X^X=0
+   2)任意一个变量X与0进行异或运算，结果不变，即X^0=X
+   3)异或运算具有可结合性，即a^b^c=（a^b）^c=a^（b^c）
+   4)异或运算具有可交换性，即a^b=b^a
+   如何不借助第三个变量来交换 a和 b
+   void testByteCal() {
+       int a = 10;
+       int b = 20;
+       a=a*b;      // a=a*b
+       b=a*b;      // b= a*b*b=a
+       a=a*b;      // a*b*a
+   }
+
+14.转置运算
+   int ^ 0XFFFF;  不同 1  相同 0
+
+15.数组指针和指针数组
+   typedef int(P_ARRAY)[10] ;
+   P_ARRAY *pArray=&arr;
+   int (*pInt) [10] =&arr;
+
+   数组指针是指向一个数组的首地址,和该数组的第一个元素的地址相同.
+   但是指针步长是整个数组. 需要对这个指针解指针,取到的是第一个元素的地址.
+
+16.如何取变量的偏移量
+   struct Person{
+
+       int age;
+       char *name;
+       char *address;
+   };
+
+   void testPianyi(){
+
+       struct Person *person=NULL;
+
+       //0000000000000000  0000000000000008  0000000000000010
+       printf("%p  %p  %p \n" ,&person->age,&person->name,&person->address );
+
+   }
+
+17.字节对齐
+    操作系统访问地址的时候,有一定的策略.
+    内存对齐是操作系统为了提高访问内存的策略。操作系统在访问内存的时候，
+    每次读取一定长度(这个长度是操作系统默认的对齐数，或者默认对齐数的整数倍)。如果没有对齐，为了访问一个变量可能产生二次访问。
+
+    字节对齐.-->
+    	对于标准数据类型，它的地址只要是它的长度的整数倍。
+    	对于非标准数据类型，比如结构体，要遵循一下对齐原则
+
+18.函数指针
+    void testFunPoint(){
+        void (*f)()=testPianyi;
+        typedef void (*FunTestPoint)();
+        FunTestPoint  funTestPoint=testPianyi;
+        f();
+        funTestPoint();
+    }
+
+    //定义函数指针
+    void(*func_array[])(int) = { func01, func02, func03 };
+
+
+
+
+
+
+

@@ -1,0 +1,144 @@
+C提升
+
+1.预处理
+  #include  <>  只找系统路径下的头文件
+  #include  ""  先找本地的头文件,再去找系统路径下的头文件
+
+2.宏定义   macro
+
+  1)	宏名一般用大写，以便于与变量区别；
+  2)	宏定义可以是常数、表达式等；
+  3)	宏定义不作语法检查，只有在编译被宏展开后的源程序才会报错；
+  4)	宏定义不是C语言，不在行末加分号；
+  5)	宏名有效范围为从定义到本源文件结束；
+  6)	可以用#undef命令终止宏定义的作用域；
+  7)	在宏定义中，可以引用已定义的宏名；
+
+  在项目中，经常把一些短小而又频繁使用的函数写成宏函数，
+  这是由于宏函数没有普通函数参数压栈、跳转、返回等的开销，可以调高程序的效率。
+
+3.带参数的宏定义
+  注意:
+  1)	宏的名字中不能有空格，但是在替换的字符串中可以有空格。ANSI C允许在参数列表中使用空格；
+  2)	用括号括住每一个参数，并括住宏的整体定义。
+  3)	用大写字母表示宏的函数名。
+  4)	如果打算宏代替函数来加快程序运行速度。假如在程序中只使用一次宏对程序的运行时间没有太大提高。
+
+  #define PRINTFN(X,Y)  (printf("%s %d\n",(X),(Y)))
+  void testMarco2(){
+
+      printf("%s\n","start-----------------------------");
+      printf("%s\n",STR1);
+      printf("%s\n",STR2);
+      printf("%s\n","end-----------------------------");
+
+      PRINTFN("hello!",100);
+  }
+
+  #define name(parameter-list) stuff    //Macro名称必须紧靠着(  否则会被当作替换的变量. 参数之间用 , 分开.
+  其中parameter-list是一个由逗号隔开的参数列表，它们可能出现在stuff中。参数列表的左括号必须与name紧邻。如果两者之间有任何空白，
+  参数列表就会被解释位stuff的一部分。
+  当宏被调用时，名字后面是一个由逗号分隔的值的列表，每个值都与宏定义中的一个参数相对应。当参数出现在程序中，与每个参数对应的实际值都将被替换到stuff中。
+
+
+4.常用的宏
+  //	__FILE__			宏所在文件的源文件名
+  //	__LINE__			宏所在行的行号
+  //	__DATE__			代码编译的日期代码编译的时间
+  //	__TIME__
+
+5.Macro \ 的作用,拼接字符串,但是不会带有空格.
+
+ #define STR1 "123\
+                     456"    //123                    456
+ #define STR2 "123"\
+                     "456"   //123456
+
+
+字符串延伸: "hello"  "world!" 可以当作一个"helloworld"
+void testMarco2() {
+
+    printf("%s\n","start-----------------------------1"   "100=-------"      "1\n" );
+    printf("%s\n",STR1);
+    printf("%s\n",STR2);
+    printf("%s\n","end-----------------------------");
+    char name[100]="Hello " "World!";
+    PRINTFN(name,100);
+}
+
+
+
+6.实现一个malloc的宏
+   //()也不能乱加,否则会影响表达式 比如 (int)*  是错误的!
+   #define MALLOC(NAME,X)     ((NAME *) malloc(sizeof(NAME)*(X)))
+
+   void testMacroMalloc(){
+       int* num= (int *) malloc(sizeof(int)*10);
+       *num=100;
+       printf("%d\n",*num);
+       int *num2=MALLOC(int ,10);
+       *num2=100;
+       printf("%d\n",*num2);
+   }
+
+7.++问题      //函数调用是形参传值,这样是直接执行,导致++
+  #define min(X, Y)  ((X) < (Y) ? (X) : (Y))
+  1
+  当有如下调用时==next = min (x + y, foo (z));==，宏体被展开成==next = ((x + y) < (foo (z)) ? (x + y) : (foo (z)));==，可以看到，foo(z)有可能会被重复调用了两次，做了重复计算。更严重的是，如果foo是不可重入的(foo内修改了全局或静态变量)，程序会产生逻辑错误
+
+
+8.宏的高级使用 #  ##  ...  \  __VA_ARGS__
+    1)变参宏
+    #define myprintf(templt,...) fprintf(stderr,templt,##__VA_ARGS__)
+    // 或者
+    #define myprintf(templt,args...) fprintf(stderr,templt,args)
+    #define myprintf(templt,args...) fprintf(stderr,templt,##args)
+
+    #define PRINTF2(...) (printf("%s %d\n",__VA_ARGS__))
+    void testVAARGS(){
+        PRINTF2("Hello!",100);
+    }
+    2) # 字符串化
+    #define TESTSINGLE(STR) #STR
+    void testSingle(){
+        printf("%s", TESTSINGLE(HELLO) "hhh" );
+    }
+
+    3)## 连接符
+            1.   #： 在宏定义中，将其后的变量，转化为字符串。
+
+                eg：  #define  str(s)      #s
+
+              输出： helloworld ， 就可以通过这样的的调用， printf( str(helloworld) );
+
+            2. ## ： 在宏定义中，将其前后的两个变量拼接在一起。
+
+                 eg： #define v(a,b,c,d)       0xa##b##c##d
+
+                 //将四个字节的十六进制的数据转化为一个十六进制的整型数据
+
+                int    a  =  v(CF,AB,B0,BC);   // 即 a = 0xCFABB0BC
+
+            3. 两者的共性： 能够阻止宏定义的递归展开。可以通过中间的转换的宏，来实现参数宏的展开。
+
+
+9.天下第一宏!!
+
+  解剖内核第一宏container_of
+  首先让我们来膜拜一下天下第一宏的风采：
+
+  #define offsetof( TYPE, MEMBER ) ( (size_t)&((TYPE *)0)->MEMBER )
+  #define container_of(ptr, type,member) ({ \
+      const typeof( ((type *)0)->member ) _mptr = (ptr); \
+      (type  *)( (char *)_mptr - offsetof(type, member) );
+  })
+
+
+
+
+
+
+
+
+
+
