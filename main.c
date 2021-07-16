@@ -47,7 +47,7 @@ int main() {
      *
      */
     int arr2[10] = {-1, 2, 10, 8, 6, -200, 100, 200};
-    int arr3[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    int arr3[10] = {1, 2, 3, 4, 5, 6, 7, 8,9, 10};
 
 //    compare(arr2);
 //    revertArr(arr3);
@@ -133,7 +133,9 @@ int main() {
 //    testMarco2();
 //    testMacroMalloc();
 //    testVAARGS();
-    testSingle();
-return 0;
+//    testSingle();
+
+    testArrPoint();
+    return 0;
 
 }

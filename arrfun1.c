@@ -310,3 +310,12 @@ void testStructRoom(){
     }
 }
 
+void testArrPoint(){
+
+    int arr[10]={0,1,2,3,4,5,6,7,8,9};
+    int (*pInt) [10] =&arr;
+    int pEle=  **pInt;
+    printf("%d\n",**pInt);
+
+
+}

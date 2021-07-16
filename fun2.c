@@ -115,7 +115,6 @@ void testByteCal() {
 
 
 void testArrPoint() {
-
     int arr[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     int *p = arr;
     printf("%p\n", p);
@@ -129,7 +128,6 @@ void testArrPoint() {
     printf("%p\n", pInt);
     int *pArrContent = *pArray;
     printf("%d  %d", **pArray, **pInt);
-
 }
 
 struct Person {
@@ -158,9 +156,9 @@ void testFunPoint() {
 }
 
 void testMacro() {
-    int num=10;
-    float f=20.2f;
-    double d=22.2f;
+    int num = 10;
+    float f = 20.2f;
+    double d = 22.2f;
 
 }
 
