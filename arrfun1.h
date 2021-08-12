@@ -20,7 +20,7 @@ void testPArr();
 
 void testPointPP();
 
-void testPointArray();
+void testPointArray2();
 
 void swapInt(int *a, int *b);
 
